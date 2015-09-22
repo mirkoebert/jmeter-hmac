@@ -1,22 +1,20 @@
 package com.ebertp.jmeter;
 
 import java.io.Serializable;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
-import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
 import org.apache.jmeter.config.Arguments;
+import org.apache.jmeter.protocol.java.sampler.AbstractJavaSamplerClient;
+import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.jmeter.samplers.SampleResult;
 import org.apache.jmeter.threads.JMeterContext;
 import org.apache.jmeter.threads.JMeterContextService;
 import org.apache.jmeter.threads.JMeterVariables;
-import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.log.Logger;
 
-public class JmeterHmacSampler  extends AbstractJavaSamplerClient implements Serializable {
-	private static final String HTTP_METHOD = "HTTP Method";
-	private static final String URL = "URL";
-	private static final String SECRET = "SECRET";
+public class JmeterWssecSampler  extends AbstractJavaSamplerClient implements Serializable {
+	
+	private static final String SECRET = "PASSWORD";
+	private static final String USER = "USER";
 	private static final long serialVersionUID = 1L;
 	private static final String BODY = "BODY";
 
@@ -25,9 +23,8 @@ public class JmeterHmacSampler  extends AbstractJavaSamplerClient implements Ser
 	@Override
 	public Arguments getDefaultParameters() {
 		Arguments defaultParameters = new Arguments();
-		defaultParameters.addArgument(URL, "http://www.ebertp.com/");
-		defaultParameters.addArgument(HTTP_METHOD, "GET");
-		defaultParameters.addArgument(SECRET, "password");
+		defaultParameters.addArgument(USER, "b2cclient");
+		defaultParameters.addArgument(SECRET, "changeit");
 		defaultParameters.addArgument(BODY, "");
 		return defaultParameters;
 	}
@@ -38,26 +35,25 @@ public class JmeterHmacSampler  extends AbstractJavaSamplerClient implements Ser
 		result.sampleStart(); // start stopwatch
 
 		// pull parameters
-		String urlString = context.getParameter( URL );
-		String searchFor = context.getParameter( HTTP_METHOD );
-		String httpBody = context.getParameter(BODY);
-		String secret = context.getParameter(SECRET);
+		String username = context.getParameter( USER );
+		String soapMsg = context.getParameter(BODY);
+		String password = context.getParameter(SECRET);
 		try {
-			HmacApiSec apisec = new HmacApiSec(secret);
-			String hmac = apisec.getHmacFromMessage(httpBody, urlString, searchFor);
-			System.out.println(hmac);
+			WssecApiSec apisec = new WssecApiSec();
+			String signSoapMeg = apisec.getSignedWsMessageFromWsMessage(soapMsg, username, password);
+			System.out.println(signSoapMeg);
 			Logger l = getLogger();
-			l.info(hmac);
+			l.info(signSoapMeg);
 			JMeterContext jmctx = JMeterContextService.getContext();
 			JMeterVariables hmacVar = new JMeterVariables();
-			hmacVar.put("hmac", hmac);
+			hmacVar.put("hmac", signSoapMeg);
 			jmctx.setVariables(hmacVar);
 			result.sampleEnd(); 
 			result.setSuccessful( true );
 			result.setResponseMessage( "Successfully performed action" );
 			result.setResponseCodeOK(); 
 
-		} catch (InvalidKeyException | NoSuchAlgorithmException e1) {
+		} catch (Exception e1) {
 			result.sampleEnd();
 			result.setSuccessful( false );
 
