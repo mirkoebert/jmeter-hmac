@@ -49,6 +49,7 @@ public final class WssecApiSec {
 			return builder.parse(in);
 		}
 	}	
+	
 	public static void main(String[] args) {
 		final String SAMPLE_SOAP_MSG = 
 		        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" 
