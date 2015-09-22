@@ -8,11 +8,11 @@ import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
 
 
-public final class ApiSec {
+public final class HmacApiSec {
 
 	private Mac sha256_HMAC;
 
-	public ApiSec(String secret) throws NoSuchAlgorithmException, InvalidKeyException{
+	public HmacApiSec(String secret) throws NoSuchAlgorithmException, InvalidKeyException{
 		sha256_HMAC = Mac.getInstance("HmacSHA256");
 		SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
 		sha256_HMAC.init(secret_key);
@@ -31,7 +31,7 @@ public final class ApiSec {
 	}
 	
 	public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeyException {
-		String finalHmac = (new ApiSec("secretXXX")).getHmacFromMessage("MEMEME", "https://ebert-p.com", "GET");
+		String finalHmac = (new HmacApiSec("secretXXX")).getHmacFromMessage("MEMEME", "https://ebert-p.com", "GET");
 		System.out.println(finalHmac);
 	}
 }

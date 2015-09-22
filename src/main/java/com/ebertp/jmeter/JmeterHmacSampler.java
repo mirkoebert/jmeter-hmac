@@ -41,7 +41,7 @@ public class JmeterHmacSampler  extends AbstractJavaSamplerClient implements Ser
 		String httpBody = context.getParameter(BODY);
 		String secret = context.getParameter(SECRET);
 		try {
-			ApiSec apisec = new ApiSec(secret);
+			HmacApiSec apisec = new HmacApiSec(secret);
 			String hmac = apisec.getHmacFromMessage(httpBody, urlString, searchFor);
 			System.out.println(hmac);
 			Logger l = getLogger();
