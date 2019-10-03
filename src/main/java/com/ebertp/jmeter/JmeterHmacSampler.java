@@ -13,7 +13,8 @@ import org.apache.jmeter.threads.JMeterVariables;
 import org.apache.jmeter.protocol.java.sampler.JavaSamplerContext;
 import org.apache.log.Logger;
 
-public class JmeterHmacSampler  extends AbstractJavaSamplerClient implements Serializable {
+public class JmeterHmacSampler extends AbstractJavaSamplerClient implements Serializable {
+    
 	private static final String SECRET = "SECRET";
 	private static final long serialVersionUID = 1L;
 	private static final String BODY = "BODY";
@@ -31,18 +32,18 @@ public class JmeterHmacSampler  extends AbstractJavaSamplerClient implements Ser
 	}
 
 	@Override
-	public SampleResult runTest(JavaSamplerContext context) {
+	public SampleResult runTest(final JavaSamplerContext context) {
 		SampleResult result = new SampleResult();
 		result.sampleStart(); // start stopwatch
 
 		// pull parameters
-		String urlString = context.getParameter( "URL" );
-		String searchFor = context.getParameter( "HTTP Method" );
-		String httpBody = context.getParameter(BODY);
-		String secret = context.getParameter(SECRET);
+		final String urlString = context.getParameter( "URL" );
+		final String searchFor = context.getParameter( "HTTP Method" );
+		final String httpBody = context.getParameter(BODY);
+		final String secret = context.getParameter(SECRET);
 		try {
 			ApiSec apisec = new ApiSec(secret);
-			String hmac = apisec.getHmacFromMessage(httpBody, urlString, searchFor);
+			String hmac = apisec.getHmacFromMessage(httpBody, urlString, searchFor);	
 			System.out.println(hmac);
 			Logger l = getLogger();
 			l.info(hmac);
@@ -54,7 +55,6 @@ public class JmeterHmacSampler  extends AbstractJavaSamplerClient implements Ser
 			result.setSuccessful( true );
 			result.setResponseMessage( "Successfully performed action" );
 			result.setResponseCodeOK(); 
-
 		} catch (InvalidKeyException | NoSuchAlgorithmException e1) {
 			result.sampleEnd();
 			result.setSuccessful( false );

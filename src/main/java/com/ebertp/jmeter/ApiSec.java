@@ -16,17 +16,15 @@ public final class ApiSec {
 		sha256_HMAC = Mac.getInstance("HmacSHA256");
 		SecretKeySpec secret_key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
 		sha256_HMAC.init(secret_key);
-
 	}
 	
-	public String getHmacFromMessage(String httpBody, String fullURL, String httpMethod){
+	public String getHmacFromMessage(final String httpBody, String fullURL, String httpMethod){
 		String hash = Base64.encodeBase64String(sha256_HMAC.doFinal(httpBody.getBytes()));
 		System.out.println(hash);
 		long d = System.currentTimeMillis();
 		String newMessage = hash + fullURL + httpMethod + d;
 		System.out.println(newMessage);
-		String hash2 = Base64.encodeBase64String(sha256_HMAC.doFinal(newMessage.getBytes()));
-		return hash2;
+		return Base64.encodeBase64String(sha256_HMAC.doFinal(newMessage.getBytes()));
 		
 	}
 	
